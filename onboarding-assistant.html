@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>新人上手助手</title>
+  <style>
+    :root {
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #eef0f3;
+      --chip-bg: #eef4ff;
+      --chip-text: #3b82f6;
+      --blue: #2563eb;
+      --blue-hover: #1d4ed8;
+      --result-bg: #f7f8fa;
+      --success: #16a34a;
+      --error: #dc2626;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #fff;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .page {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 56px 32px 80px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .lead {
+      margin: 10px 0 28px;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .ask-row {
+      display: flex;
+      align-items: stretch;
+      gap: 14px;
+    }
+
+    #question {
+      flex: 1;
+      min-width: 0;
+      height: 52px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 10px;
+      background: #f3f4f6;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+    }
+
+    #question::placeholder {
+      color: #9ca3af;
+    }
+
+    #question:focus {
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+    }
+
+    .btn-submit {
+      flex: 0 0 auto;
+      min-width: 128px;
+      height: 52px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn-submit:hover {
+      background: var(--blue-hover);
+    }
+
+    .error {
+      min-height: 22px;
+      margin: 8px 0 0;
+      color: var(--error);
+      font-size: 13px;
+    }
+
+    .error:empty {
+      margin: 0;
+      min-height: 0;
+    }
+
+    .examples {
+      margin-top: 28px;
+    }
+
+    .examples h2 {
+      margin: 0 0 14px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 16px;
+    }
+
+    .chip {
+      border: 0;
+      border-radius: 999px;
+      padding: 8px 16px;
+      background: var(--chip-bg);
+      color: var(--chip-text);
+      font-size: 14px;
+      line-height: 1.4;
+      cursor: pointer;
+      text-align: left;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .chip:hover {
+      background: #e0eaff;
+    }
+
+    .result {
+      margin-top: 28px;
+      padding: 36px 40px;
+      background: var(--result-bg);
+      border-radius: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .submitted-q {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .submitted-q strong {
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .idle-title,
+    .miss-title {
+      margin: 0 0 10px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .idle-desc,
+    .miss-desc {
+      margin: 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .miss-desc + .miss-desc {
+      margin-top: 8px;
+    }
+
+    .answer-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .answer-label,
+    .source-label {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .demo-tag {
+      color: #9ca3af;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .answer-body {
+      margin: 0;
+      color: #1f2937;
+      font-size: 15px;
+    }
+
+    .answer-body ol {
+      margin: 6px 0 10px;
+      padding-left: 1.4em;
+    }
+
+    .answer-body li {
+      margin: 2px 0;
+    }
+
+    .source {
+      margin-top: 28px;
+    }
+
+    .source-name {
+      margin: 8px 0 6px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .source-excerpt {
+      margin: 0;
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .feedback {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 14px;
+      margin-top: 18px;
+    }
+
+    .feedback-q {
+      color: #4b5563;
+      font-size: 14px;
+    }
+
+    .fb-btn {
+      min-width: 88px;
+      height: 38px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 8px;
+      background: #eef4ff;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .fb-btn.is-selected {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .fb-ok {
+      color: var(--success);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 720px) {
+      .page { padding: 28px 16px 48px; }
+      h1 { font-size: 26px; }
+      .ask-row { flex-direction: column; }
+      .btn-submit,
+      #question { width: 100%; }
+      .result { padding: 24px 18px; }
+      .answer-head { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>新人上手助手</h1>
+    <p class="lead">选择下方示例问题，体验新人业务问答。当前为演示版本，使用虚构培训资料</p>
+
+    <form id="ask-form" novalidate>
+      <div class="ask-row">
+        <label class="visually-hidden" for="question" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">问题</label>
+        <input id="question" name="question" type="text" autocomplete="off" placeholder="请输入问题，或选择下方示例问题" />
+        <button class="btn-submit" type="submit">提交问题</button>
+      </div>
+      <p class="error" id="error" role="alert"></p>
+    </form>
+
+    <section class="examples" aria-label="示例问题">
+      <h2>你可以从这些问题开始</h2>
+      <div class="chips" id="chips"></div>
+    </section>
+
+    <section class="result" id="result" aria-live="polite"></section>
+    <div class="feedback hidden" id="feedback"></div>
+  </main>
+
+  <script>
+    const QA_ITEMS = [
+      {
+        question: "入职第一周要完成哪些事？",
+        sourceName: "《新人上手手册（演示）》第 1 章「入职第一周清单」",
+        excerpt: "入职第一周须完成四件事：1）在内部账号平台开通邮箱与协作账号；2）阅读本手册第 1～2 章并完成新人测验；3）与导师确认本周跟岗安排；4）在周五前提交一份「本周学习记录」。未完成账号开通前，不要自行申请业务系统权限。",
+        answerHtml:
+          "<p>入职第一周需要完成四件事：</p>" +
+          "<ol>" +
+          "<li>开通邮箱和协作账号。</li>" +
+          "<li>读完手册第 1～2 章并做新人测验。</li>" +
+          "<li>和导师确认本周跟岗安排。</li>" +
+          "<li>周五前交一份「本周学习记录」。</li>" +
+          "</ol>" +
+          "<p>账号还没开通时，先不要自己去申请业务系统权限。</p>"
+      },
+      {
+        question: "什么是测试环境？",
+        sourceName: "《环境与发布说明（演示）》第 2 节「环境定义」",
+        excerpt: "测试环境是供功能验证使用的独立系统环境，数据为脱敏后的演示数据，不能当作生产环境。新人只可在测试环境练习操作；涉及真实客户数据或正式下单的操作，必须在生产环境由有权限同事执行。测试环境地址以「test-」开头，与生产地址不同。",
+        answerHtml: "<p>测试环境是专门用来做功能验证的独立环境，里面是脱敏后的演示数据，不能当成生产环境用。新人只在测试环境练习。涉及真实客户数据或正式下单，要在生产环境由有权限的同事操作。测试环境地址以「test-」开头，和生产地址不是同一个。</p>"
+      },
+      {
+        question: "遇到系统问题应该怎么反馈？",
+        sourceName: "《问题反馈指引（演示）》第 3 节「系统问题怎么提」",
+        excerpt: "遇到系统问题，请先不要反复尝试可能改动数据的操作。按以下顺序反馈：1）在「问题反馈」频道提交；2）标题写清系统和现象；3）补充发生时间、你的账号、测试环境或生产环境、已尝试的步骤。紧急且影响生产时，同时 @ 值班同事。普通咨询仍优先查阅手册，避免把术语问题当成系统故障提交。",
+        answerHtml: "<p>遇到系统问题，先不要反复做可能改数据的操作。按顺序：到「问题反馈」频道提交；标题写清系统和现象；补充发生时间、你的账号、是测试还是生产、已经试过什么。如果紧急且影响生产，同时 @ 值班同事。普通名词或流程问题，先查手册，不要当成系统故障去提。</p>"
+      }
+    ];
+
+    const form = document.getElementById("ask-form");
+    const input = document.getElementById("question");
+    const errorEl = document.getElementById("error");
+    const chipsEl = document.getElementById("chips");
+    const resultEl = document.getElementById("result");
+    const feedbackEl = document.getElementById("feedback");
+
+    let submittedQuestion = null;
+    let matchedItem = null;
+    let uncovered = false;
+    let feedback = null;
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function submittedLine() {
+      if (!submittedQuestion) return "";
+      return (
+        '<p class="submitted-q">本次已提交：<strong>' +
+        escapeHtml(submittedQuestion) +
+        "</strong></p>"
+      );
+    }
+
+    function renderIdle() {
+      resultEl.innerHTML =
+        '<h3 class="idle-title" style="font-size:22px;font-weight:700;margin:0 0 10px;">从一个问题开始</h3>' +
+        '<p class="idle-desc">提交示例问题后，这里将展示回答与资料依据</p>';
+      feedbackEl.className = "feedback hidden";
+      feedbackEl.innerHTML = "";
+    }
+
+    function renderUncovered() {
+      resultEl.innerHTML =
+        submittedLine() +
+        '<h3 class="miss-title">暂未覆盖这个问题</h3>' +
+        '<p class="miss-desc">演示资料暂未覆盖该问题，请尝试示例问题。</p>' +
+        '<p class="miss-desc">点击上方任一示例问题，填入后再提交。</p>';
+      feedbackEl.className = "feedback hidden";
+      feedbackEl.innerHTML = "";
+    }
+
+    function renderMatch() {
+      const item = matchedItem;
+      resultEl.innerHTML =
+        submittedLine() +
+        '<div class="answer-head">' +
+        '<p class="answer-label">回答</p>' +
+        '<span class="demo-tag">演示回答 · 虚构资料</span>' +
+        "</div>" +
+        '<div class="answer-body">' + item.answerHtml + "</div>" +
+        '<div class="source">' +
+        '<p class="source-label">资料依据</p>' +
+        '<p class="source-name">' + escapeHtml(item.sourceName) + "</p>" +
+        '<p class="source-excerpt">原文：' + escapeHtml(item.excerpt) + "</p>" +
+        "</div>";
+
+      const helpfulClass = feedback === "helpful" ? "fb-btn is-selected" : "fb-btn";
+      const unhelpfulClass = feedback === "unhelpful" ? "fb-btn is-selected" : "fb-btn";
+      const okHtml = feedback
+        ? '<span class="fb-ok">已收到反馈，谢谢！</span>'
+        : "";
+
+      feedbackEl.className = "feedback";
+      feedbackEl.innerHTML =
+        '<span class="feedback-q">这个回答对你有帮助吗？</span>' +
+        '<button class="' + helpfulClass + '" type="button" data-fb="helpful">有帮助</button>' +
+        '<button class="' + unhelpfulClass + '" type="button" data-fb="unhelpful">没帮助</button>' +
+        okHtml;
+    }
+
+    function render() {
+      if (matchedItem) {
+        renderMatch();
+      } else if (uncovered) {
+        renderUncovered();
+      } else {
+        renderIdle();
+      }
+    }
+
+    function clearError() {
+      errorEl.textContent = "";
+    }
+
+    function submitQuestion() {
+      const trimmed = input.value.trim();
+      if (!trimmed) {
+        errorEl.textContent = "请输入问题";
+        return;
+      }
+      clearError();
+      submittedQuestion = trimmed;
+      feedback = null;
+      matchedItem = QA_ITEMS.find(function (item) {
+        return item.question === trimmed;
+      }) || null;
+      uncovered = !matchedItem;
+      render();
+    }
+
+    chipsEl.innerHTML = QA_ITEMS.map(function (item) {
+      return (
+        '<button class="chip" type="button" data-q="' +
+        escapeHtml(item.question) +
+        '">' +
+        escapeHtml(item.question) +
+        "</button>"
+      );
+    }).join("");
+
+    chipsEl.addEventListener("click", function (event) {
+      const chip = event.target.closest(".chip");
+      if (!chip) return;
+      input.value = chip.getAttribute("data-q");
+      input.focus();
+      if (input.value.trim()) clearError();
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      submitQuestion();
+    });
+
+    input.addEventListener("input", function () {
+      if (input.value.trim()) clearError();
+    });
+
+    feedbackEl.addEventListener("click", function (event) {
+      const btn = event.target.closest("[data-fb]");
+      if (!btn || !matchedItem) return;
+      feedback = btn.getAttribute("data-fb");
+      renderMatch();
+    });
+
+    render();
+  </script>
+</body>
+</html>
